@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="Description" content="Enter your description here"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" integrity="sha512-c42qTSw/wPZ3/5LBzD+Bw5f7bSF2oxou6wEb+I/lqeaKV5FDIfMvvRp772y4jcJLKuGUOpbJMdg/BTl50fJYAw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<title>To Do App</title>
+</head>
+<style>
+    .done{
+        text-decoration: line-through !important;
+        animation: .5s bounce;
+    }
+    .created{
+        animation: .5s fadeInDown;
+    }
+    .deleted{
+        animation: .5s shakeX;
+    }
+</style>
+<body>
+<div class="container" id="app">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-4">
+            <div class="my-5">
+                <h2 class="text-center mb-4 text-primary">Daily Routine</h2>
+                <div class="form-row mb-3">
+                    <div class="col-10">
+                        <input type="text" class="form-control" v-model="newMessage" @keyup.enter="create()" placeholder="What do you want to do?">
+                    </div>
+                    <div class="col-2">
+                        <button class="btn btn-primary w-100" @click="create()">
+                            <i class="fas fa-plus-square"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <p class="mb-0 font-weight-bold text-primary">Job List{{lists.length>1?"s":""}}</p>
+                    <p v-if="lists.length>0 && doneTotal===lists.length" class="badge badge-success badge-pill">All Done <i class="fas fa-check-square"></i></p>
+                    <p v-else class="badge badge-primary badge-pill">Done {{doneTotal}}</p>
+                </div>
+                <ul class="list-group">
+                    <li v-for="list in lists" :key="list.id" @dblclick="list.isEdit=true" :class="['list-group-item d-flex justify-content-between align-items-center created',{'deleted':list.isDelete}]">
+                        <input v-if="list.isEdit" type="text" v-model="list.message" @keyup.enter="list.isEdit=false" class="form-control form-control-lg mr-2">
+                        <div v-else class="cunstom-control custom-checkbox">
+                            <input type="checkbox" v-model="list.isDone" class="cunstom-control-input" :id="'customCheck'+list.id">
+                            <label for="" :class="['cunstom-control-label',{'done':list.isDone}]" :for="'customCheck'+list.id" >{{list.message}}</label>
+                        </div>
+                        <!-- <i class="fas fa-trash-alt text-primary" @click="del(list.id)"></i> -->
+                        <i class="fas fa-trash-alt text-primary" @click="[list.isDelete=true,del(list.id)]"></i>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script>
+    let app=new Vue({
+        el:"#app",
+        data:{
+            currentId:0,
+            newMessage:"",
+            lists:[
+                
+                ]
+            },
+            computed:{
+                doneTotal(){
+                        return this.lists.filter(el=>el.isDone===true).length
+                }
+            },
+            methods:{
+                create(){
+                    this.currentId++
+                    this.lists.push({
+                        id:this.currentId,
+                        message:this.newMessage,
+                        isDone:false,
+                        isEdit:false,
+                        isDelete:false,
+                    });
+                    this.newMessage="";
+                },
+                del(x){
+                    // if(confirm('Are you sure to Delete?')){
+                        setTimeout(()=>this.lists=this.lists.filter(el=>el.id !==x),501)
+                    // }
+                }
+        }
+    }) 
+</script>
+</body>
+</html>
